@@ -10,7 +10,30 @@ Although I had years of health and fitness data, the answer wasn't obvious. The 
 
 Instead of relying on memory, intuition, or how I felt after a workout, I wanted evidence. I wanted to know whether the data actually supported the conclusions I was drawing about my own progress, and whether my reasoning could stand up to the data rather than assumptions.
 
-Answering that question required building an end-to-end analytics pipeline that integrates four independent health data sources, cleans and validates heterogeneous datasets, engineers analytical features, and prepares both an auditable cleaned dataset (`df_clean`) and a modeling dataset (`df_model`) for statistical modeling. The resulting pipeline supports longitudinal analyses of body composition, training volume, strength progression, recovery metrics, and relationships between exercise behavior and physical outcomes.
+Answering that question required building an end-to-end analytics pipeline that integrates four independent health data sources, cleans and validates heterogeneous datasets, engineers analytical features, and prepares both an auditable cleaned dataset (`df_clean`) and a modeling dataset (`df_model`) for statistical modeling.
+
+The overall data pipeline follows the workflow below:
+
+```text
+Raw exports
+      │
+      ▼
+Python ingestion
+      │
+      ▼
+MySQL relational database
+      │
+      ▼
+SQL validation & cleaning
+      │
+      ▼
+Merged analytical datasets
+      │
+      ▼
+Statistical analysis
+```
+
+The resulting pipeline supports longitudinal analyses of body composition, training volume, strength progression, recovery metrics, and relationships between exercise behavior and physical outcomes.
 
 ---
 
@@ -54,7 +77,7 @@ The project combines data exported from four independent platforms:
 - myNetDiary
 - Manual body measurements
 
-These datasets are cleaned, standardized, and merged into a unified analytical dataset for downstream modeling.
+These datasets are imported into a relational MySQL database, validated and standardized through a combination of Python and SQL workflows, and ultimately merged into unified analytical datasets for downstream statistical modeling.
 
 ---
 
@@ -122,14 +145,15 @@ docs/run_order.md
 
 The pipeline performs:
 
-- Raw Garmin activity cleaning
-- Data standardization and datatype conversion
+- Automated ingestion of raw health datasets
+- Construction of raw MySQL database tables
+- SQL-based validation and standardization
+- Data cleaning and datatype conversion
 - Feature profiling and quality assessment
-- Manual review of suspicious observations
-- Construction of an auditable cleaned dataset (`df_clean`)
-- Construction of a modeling dataset (`df_model`)
+- Construction of auditable cleaned datasets (`df_clean`)
+- Construction of modeling datasets (`df_model`)
 - Feature engineering
-- Dataset integration
+- Dataset integration across multiple health platforms
 - Statistical analysis
 - Visualization generation
 

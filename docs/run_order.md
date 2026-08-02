@@ -94,3 +94,88 @@ Engineering decisions made during this step.
 - Strength Training activities with a **Total Time** below **10 minutes** were manually reviewed and determined to represent incomplete or accidental recordings. These observations were removed from `df_model` while remaining in `df_clean`.
 - Not every reviewed feature results in a modeling filter. Features that pass manual inspection remain unchanged, documenting that they were evaluated and determined to be suitable for analysis.
 - Apple Health timestamps required timezone normalization before merging with other datasets.
+
+## Step 2 — Build Measurement Database
+
+**Input**
+
+```text
+data/raw/measurements.csv
+```
+
+**Purpose**
+
+This step builds the project's measurement database. The original body measurement records are imported into a raw MySQL table, validated, standardized, and exported as a cleaned dataset for downstream integration and analysis.
+
+---
+
+### Step 2.1 — Create the Raw SQL Table
+
+Open:
+
+```text
+sql/measurement.sql
+```
+
+Run **Section 1 only**.
+
+This creates the raw `measurements` table inside the `fitnessData` MySQL database.
+
+## ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+**Do not continue to Section 2 yet.**
+
+## ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+---
+
+### Step 2.2 — Load the Raw Data
+
+Run:
+
+```text
+scripts/cleaning/load_measurements.py
+```
+
+This script reads the original `measurements.csv` file and imports every observation into the SQL table.
+
+During the import the script:
+
+- Converts pandas missing values (`NaN`) into SQL `NULL` values.
+- Truncates the existing table before loading to prevent duplicate imports.
+- Preserves the raw measurement values without performing any cleaning or transformations.
+
+---
+
+### Step 2.3 — Validate and Standardize the SQL Table
+
+Return to:
+
+```text
+sql/measurement.sql
+```
+
+Run **Section 2**.
+
+This section:
+
+- Verifies the import completed successfully.
+- Confirms the expected number of records were imported.
+- Converts the imported date column into the SQL `DATE` datatype.
+- Checks for duplicate measurement dates.
+- Creates the finalized `measurements_clean` table ordered by descending date.
+- Performs final validation of the cleaned table.
+
+---
+
+### Step 2.4 — Export the Cleaned Dataset
+
+Using MySQL Workbench, manually export the `measurements_clean` table.
+
+Save the exported CSV to:
+
+```text
+data/cleaned/
+```
+
+This exported dataset is used during later stages of the project for dataset integration, feature engineering, and downstream statistical analyses.
