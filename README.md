@@ -102,11 +102,11 @@ git clone https://github.com/ThatOneNebulaGirl/fitness-analytics.git
 cd fitness-analytics
 ```
 
-Install dependencies:
+Required software
 
-```bash
-pip install -r requirements.txt
-```
+- Python 3.12+
+- Jupyter Notebook
+- MySQL 8+
 
 ---
 
