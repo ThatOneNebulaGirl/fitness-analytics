@@ -1,0 +1,6 @@
+# Environment / secrets
+.env
+config/credentials.py
+
+# Temporary analysis folders
+data/processed/doublecheck FEATURE csv/
