@@ -145,7 +145,8 @@ docs/run_order.md
 
 The pipeline performs:
 
-- Automated ingestion of raw health datasets
+- Garmin activity data cleaning and validation
+- Apple Health XML record discovery and extraction
 - Construction of raw MySQL database tables
 - SQL-based validation and standardization
 - Data cleaning and datatype conversion

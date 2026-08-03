@@ -179,3 +179,80 @@ data/cleaned/
 ```
 
 This exported dataset is used during later stages of the project for dataset integration, feature engineering, and downstream statistical analyses.
+
+---
+
+---
+
+## Step 3 — Extract Apple Health Datasets
+
+**Input**
+
+```text
+data/raw/apple_export.xml
+```
+
+**Purpose**
+
+Apple Health exports all <span style="color:lime">HealthKit</span> data into a single XML file containing more than 1.7 million records across dozens of different HealthKit record types. Before cleaning or analysis can begin, the available record types must first be identified so that only datasets relevant to this project are extracted.
+
+---
+
+### Step 3.1 — Audit Available HealthKit Record Types
+
+Using the terminal, inspect the Apple Health XML export to identify the available <span style="color:lime">HealthKit</span> record types.
+
+Example:
+
+```bash
+grep '<Record type="' apple_export.xml \
+| sed -n 's/.*type="\([^"]*\)".*/\1/p' \
+| sort \
+| uniq
+```
+
+After identifying the available <span style="color:lime">HealthKit</span> record types, perform a second audit to determine the frequency of project-relevant datasets.
+
+Example:
+
+```bash
+grep '<Record type="' apple_export.xml \
+| sed -n 's/.*type="\([^"]*\)".*/\1/p' \
+| awk '
+/Sleep|Energy|Exercise|Walking|Body|Flights|Heart|Waist|Count/ {
+    count[$0]++
+}
+END {
+    for (k in count)
+        printf "%8d %s\n", count[k]
+}' \
+| sort -nr
+```
+
+This audit is used to determine which <span style="color:lime">HealthKit</span> datasets should be extracted and which can be excluded from the remainder of the project.
+
+---
+
+### Step 3.2 — Extract Selected HealthKit Datasets
+
+Run:
+
+```text
+scripts/cleaning/apple_health_extract.py
+```
+
+This script:
+
+- Reads the Apple Health XML export.
+- Discovers all available HealthKit record types.
+- Filters record types using project-specific keywords.
+- Excludes HealthKit datasets that are not used in this study.
+- Exports each selected <span style="color:lime">HealthKit</span> record type into its own raw CSV file.
+
+The extracted datasets are saved to:
+
+```text
+data/processed/apple_data_raw_extract/
+```
+
+These raw CSV files become the input for the Apple Health cleaning pipeline.
