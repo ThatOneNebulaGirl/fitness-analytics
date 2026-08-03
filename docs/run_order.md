@@ -328,3 +328,53 @@ data/processed/apple_daily/
 ```
 
 These daily datasets provide the standardized inputs used during later stages of feature engineering and dataset integration.
+
+---
+
+## Step 6 — Extract myNetDiary Measurements
+
+**Input**
+
+```text
+data/raw/myNetDiary/Measurements-*.csv
+```
+
+Run
+
+```text
+scripts/cleaning/mynet_measurement_extract.py
+```
+
+**Purpose**
+
+This step consolidates historical myNetDiary measurement exports into standardized datasets for downstream integration with the project's manually collected body measurements and Apple Health records.
+
+The script automatically:
+
+- Loads every `Measurements-*.csv` file found in the raw myNetDiary directory.
+- Combines the exports into a single dataset.
+- Separates body-composition measurements from daily step records.
+- Standardizes the date column.
+- Sorts observations chronologically.
+- Performs duplicate-date and duplicate-measurement audits.
+- Reports measurement counts and date ranges.
+- Saves cleaned datasets for later SQL integration.
+
+**Outputs**
+
+```text
+data/cleaned/myNetDiary/
+├── mynet_body_measurements.csv
+└── mynet_daily_steps.csv
+```
+
+**Validation**
+
+Verify that:
+
+- Measurement counts match the original exports.
+- No duplicate body measurements exist for the same date and measurement type.
+- No duplicate daily step dates exist.
+- Date ranges match the original myNetDiary exports.
+
+---
