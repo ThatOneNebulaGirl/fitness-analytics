@@ -105,7 +105,7 @@ data/raw/measurements.csv
 
 **Purpose**
 
-This step builds the project's measurement database. The original body measurement records are imported into a raw MySQL table, validated, standardized, and exported as a cleaned dataset for downstream integration and analysis.
+This step establishes the project's measurement database. The original body measurement records are imported into a raw MySQL table, validated, standardized, and exported as a cleaned dataset that will later be integrated with Apple Health and myNetDiary body-composition records.
 
 ---
 
@@ -137,13 +137,16 @@ Run:
 scripts/cleaning/load_measurements.py
 ```
 
-This script reads the original `measurements.csv` file and imports every observation into the SQL table.
+Originally, the raw `measurements.csv` file was intended to be imported directly using the MySQL Import Wizard. However, the import repeatedly failed because the dataset contains many sparse numeric columns where body measurements were intentionally left blank.
+
+Rather than modifying the original dataset to satisfy the import tool, this script loads the raw CSV using Pandas and inserts the records into MySQL programmatically while preserving the original data.
 
 During the import the script:
 
 - Converts pandas missing values (`NaN`) into SQL `NULL` values.
-- Truncates the existing table before loading to prevent duplicate imports.
-- Preserves the raw measurement values without performing any cleaning or transformations.
+- Truncates the existing table before loading to prevent duplicate imports during repeated execution.
+- Inserts every observation into the raw `measurements` table.
+- Preserves the original measurement values without performing any cleaning or transformations.
 
 ---
 
