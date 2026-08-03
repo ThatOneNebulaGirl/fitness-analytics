@@ -185,8 +185,6 @@ This exported dataset is used during later stages of the project for dataset int
 
 ---
 
----
-
 ## Step 3 — Extract Apple Health Datasets
 
 **Input**
@@ -376,5 +374,45 @@ Verify that:
 - No duplicate body measurements exist for the same date and measurement type.
 - No duplicate daily step dates exist.
 - Date ranges match the original myNetDiary exports.
+
+---
+
+## Step 7 — Reshape myNetDiary Body Measurements
+
+**Input**
+
+```text
+data/cleaned/myNetDiary/mynet_body_measurements.csv
+```
+
+Run
+
+```text
+scripts/cleaning/mynet_pivot_measurements.py
+```
+
+**Purpose**
+
+The extracted myNetDiary body measurements are stored in a long format, where each row represents a single measurement type recorded on a particular date. This step reshapes the dataset into a wide format so that each measurement date occupies a single row with separate columns for each body measurement.
+
+The resulting dataset mirrors the structure of the manually collected measurement table, simplifying downstream SQL integration.
+
+The script:
+
+- Loads the standardized body measurement dataset.
+- Converts dates to datetime format.
+- Reshapes the data using a pivot operation.
+- Renames columns to match the project's naming conventions.
+- Audits duplicate dates.
+- Reports missing values.
+- Reports the available date range.
+- Saves the reshaped dataset.
+
+**Output**
+
+```text
+data/cleaned/myNetDiary/
+└── mynet_body_measurements_wide.csv
+```
 
 ---
