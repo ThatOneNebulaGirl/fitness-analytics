@@ -121,13 +121,14 @@ Run **Section 1 only**.
 
 This creates the raw `measurements` table inside the `fitnessData` MySQL database.
 
+<div style="color:red; font-weight:bold;">
 ## ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
 **Do not continue to Section 2 yet.**
 
 ## ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
----
+## </div>
 
 ### Step 2.2 — Load the Raw Data
 
@@ -416,3 +417,136 @@ data/cleaned/myNetDiary/
 ```
 
 ---
+
+---
+
+## Step 8 — Integrate myNetDiary Body Measurements
+
+**Input**
+
+```text
+data/cleaned/myNetDiary/mynet_body_measurements_wide.csv
+```
+
+### Step 8.1 — Create the SQL Table
+
+Open:
+
+```text
+sql/mynet_measurements.sql
+```
+
+<div style="color:red; font-weight:bold;">
+⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+Run **Section 1 only**.
+
+⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+</div>
+
+This creates the raw `mynet_measurements` table inside the `fitnessData` database.
+
+Do not continue until the table has been populated.
+
+---
+
+### Step 8.2 — Load the Dataset
+
+Run:
+
+```text
+scripts/cleaning/load_mynet_measurements.py
+```
+
+The MySQL Import Wizard could not reliably import the dataset because many body-measurement columns intentionally contain missing values. This script imports the CSV using Pandas, converts missing values into SQL `NULL` values, and loads the dataset programmatically.
+
+---
+
+### Step 8.3 — Validate and Merge
+
+Return to:
+
+```text
+sql/mynet_measurements.sql
+```
+
+Run the remaining sections.
+
+This step:
+
+- Confirms the expected number of imported observations.
+- Reviews overlapping measurement dates.
+- Merges only unique body-measurement observations into `measurements_clean`.
+- Excludes weight-only observations from the body-measurement table.
+- Excludes generic thigh measurements because laterality cannot be determined.
+- Verifies that no duplicate measurement dates exist after integration.
+- Validates the final integrated measurement database.
+
+---
+
+## Step 9 — Integrate Apple Health Waist Measurements
+
+**Input**
+
+```text
+data/processed/apple_daily/waistcircumference_clean.csv
+```
+
+### Step 9.1 — Create the SQL Table
+
+Open:
+
+```text
+sql/waist_data_integration.sql
+```
+
+<div style="color:red; font-weight:bold;">
+
+⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+Run **Section 1 only**.
+
+⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+</div>
+
+This creates the `waist_appleData` table inside the `fitnessData` database.
+
+Do not continue until the table has been populated.
+
+---
+
+### Step 9.2 — Import the Cleaned Dataset
+
+Using **MySQL Workbench**, import:
+
+```text
+data/processed/apple_daily/waistcircumference_clean.csv
+```
+
+into the `waist_appleData` table.
+
+This dataset has already been cleaned and standardized during the Apple Health preprocessing pipeline and is imported directly without additional modification.
+
+---
+
+### Step 9.3 — Validate and Merge
+
+Return to:
+
+```text
+sql/waist_data_integration.sql
+```
+
+Run the remaining sections.
+
+This step:
+
+- Confirms the expected number of imported waist measurements.
+- Reviews duplicate Apple Health measurement dates.
+- Removes duplicate observations after manual validation.
+- Merges only unique Apple Health waist measurements into the intermediate `waist` table.
+- Updates existing waist measurements in `measurements_clean`.
+- Inserts newly recovered measurement dates into `measurements_clean`.
+- Validates the finalized measurement database.
