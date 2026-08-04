@@ -1,4 +1,5 @@
 # this code inspects and prepares my measurement data.
+create database fitnessData;
 use fitnessData;
 
 -- ============================================================
