@@ -330,60 +330,108 @@ These daily datasets provide the standardized inputs used during later stages of
 
 ---
 
-## Step 6 — Extract myNetDiary Measurements
+# Step 6 — Load Daily Apple Health Datasets into MySQL
 
 **Input**
 
 ```text
-data/raw/myNetDiary/Measurements-*.csv
+data/processed/apple_daily/
 ```
 
 Run
 
 ```text
-scripts/cleaning/mynet_measurement_extract.py
+scripts/loading/load_appleFeatures.py
 ```
 
 **Purpose**
 
-This step consolidates historical myNetDiary measurement exports into standardized datasets for downstream integration with the project's manually collected body measurements and Apple Health records.
+The processed Apple Health datasets are now stored as standardized daily observations, but they still exist only as CSV files. Rather than importing each dataset manually through MySQL Workbench, this project uses a reusable Python ETL pipeline to automatically populate the SQL database.
 
-The script automatically:
+The loading pipeline consists of reusable loading utilities together with a single driver script that automatically discovers every processed Apple Health dataset and imports it into its corresponding SQL table.
 
-- Loads every `Measurements-*.csv` file found in the raw myNetDiary directory.
-- Combines the exports into a single dataset.
-- Separates body-composition measurements from daily step records.
-- Standardizes the date column.
-- Sorts observations chronologically.
-- Performs duplicate-date and duplicate-measurement audits.
-- Reports measurement counts and date ranges.
-- Saves cleaned datasets for later SQL integration.
+The pipeline performs the following steps for every dataset:
 
-**Outputs**
+- Automatically discovers every `*_clean.csv` file inside `data/processed/apple_daily/`.
+- Determines the destination SQL table from the filename.
+- Loads the CSV into Pandas.
+- Converts date columns into SQL-compatible datatypes.
+- Renames feature columns to match the SQL schema.
+- Truncates the destination table before loading to prevent duplicate imports.
+- Bulk inserts every observation into MySQL.
+- Validates the imported row count.
+- Displays sample observations for verification.
+
+The reusable loading utilities are implemented in:
 
 ```text
-data/cleaned/myNetDiary/
-├── mynet_body_measurements.csv
-└── mynet_daily_steps.csv
+src/tools_for_loading_SQL.py
 ```
 
-**Validation**
+while the automated ETL pipeline is executed from:
 
-Verify that:
+```text
+scripts/loading/load_appleFeatures.py
+```
 
-- Measurement counts match the original exports.
-- No duplicate body measurements exist for the same date and measurement type.
-- No duplicate daily step dates exist.
-- Date ranges match the original myNetDiary exports.
+**Output**
+
+```text
+fitnessData (MySQL)
+
+├── activeenergyburned
+├── appleexercisetime
+├── basalenergyburned
+├── bodymass
+├── bodymassindex
+├── distancewalkingrunning
+├── flightsclimbed
+├── heartrate
+├── heartratevariabilitysdnn
+├── respiratoryrate
+├── stepcount
+├── waistcircumference
+├── walkingheartrateaverage
+├── walkingspeed
+└── walkingsteplength
+```
+
+At the completion of this step, every processed Apple Health feature has been loaded into MySQL using a reproducible ETL pipeline. These tables provide the standardized SQL inputs used during subsequent body-composition integration, feature engineering, and statistical analysis.
 
 ---
 
-## Step 7 — Reshape myNetDiary Body Measurements
+# Step 7 — Extract myNetDiary Measurements
 
 **Input**
 
 ```text
-data/cleaned/myNetDiary/mynet_body_measurements.csv
+data/raw/myNetDiary/
+```
+
+Run
+
+```text
+scripts/cleaning/load_mynet_measurements.py
+```
+
+**Purpose**
+
+Extract the historical body-composition measurements from the archived myNetDiary export. Retain only measurements relevant to the project while excluding derived or sparsely populated variables.
+
+**Output**
+
+```text
+data/cleaned/myNetDiary/
+```
+
+---
+
+# Step 8 — Reshape myNetDiary Body Measurements
+
+**Input**
+
+```text
+data/cleaned/myNetDiary/
 ```
 
 Run
@@ -394,98 +442,45 @@ scripts/cleaning/mynet_pivot_measurements.py
 
 **Purpose**
 
-The extracted myNetDiary body measurements are stored in a long format, where each row represents a single measurement type recorded on a particular date. This step reshapes the dataset into a wide format so that each measurement date occupies a single row with separate columns for each body measurement.
-
-The resulting dataset mirrors the structure of the manually collected measurement table, simplifying downstream SQL integration.
-
-The script:
-
-- Loads the standardized body measurement dataset.
-- Converts dates to datetime format.
-- Reshapes the data using a pivot operation.
-- Renames columns to match the project's naming conventions.
-- Audits duplicate dates.
-- Reports missing values.
-- Reports the available date range.
-- Saves the reshaped dataset.
+Convert the long-format myNetDiary measurement records into a wide-format table where each measurement date occupies one row and each body measurement occupies its own dedicated column. This creates a schema compatible with the manually collected measurement database.
 
 **Output**
 
 ```text
-data/cleaned/myNetDiary/
-└── mynet_body_measurements_wide.csv
+data/cleaned/measurements_clean_myNetDiary.csv
 ```
 
 ---
 
----
-
-## Step 8 — Integrate myNetDiary Body Measurements
+# Step 9 — Integrate myNetDiary Body Measurements
 
 **Input**
 
 ```text
-data/cleaned/myNetDiary/mynet_body_measurements_wide.csv
+data/cleaned/measurements_clean_myNetDiary.csv
 ```
 
-### Step 8.1 — Create the SQL Table
-
-Open:
+Run
 
 ```text
 sql/mynet_measurements.sql
 ```
 
-<div style="color:red; font-weight:bold;">
-⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+**Purpose**
 
-Run **Section 1 only**.
+Validate imported measurement dates, identify duplicate observations, and merge only unique historical chest, waist, and hip measurements into the validated `measurements_clean` database.
 
-⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+The resulting SQL table is validated by confirming the expected record count, checking for duplicate dates, and verifying chronological ordering.
 
-</div>
-
-This creates the raw `mynet_measurements` table inside the `fitnessData` database.
-
-Do not continue until the table has been populated.
-
----
-
-### Step 8.2 — Load the Dataset
-
-Run:
+**Output**
 
 ```text
-scripts/cleaning/load_mynet_measurements.py
+measurements_clean
 ```
-
-The MySQL Import Wizard could not reliably import the dataset because many body-measurement columns intentionally contain missing values. This script imports the CSV using Pandas, converts missing values into SQL `NULL` values, and loads the dataset programmatically.
 
 ---
 
-### Step 8.3 — Validate and Merge
-
-Return to:
-
-```text
-sql/mynet_measurements.sql
-```
-
-Run the remaining sections.
-
-This step:
-
-- Confirms the expected number of imported observations.
-- Reviews overlapping measurement dates.
-- Merges only unique body-measurement observations into `measurements_clean`.
-- Excludes weight-only observations from the body-measurement table.
-- Excludes generic thigh measurements because laterality cannot be determined.
-- Verifies that no duplicate measurement dates exist after integration.
-- Validates the final integrated measurement database.
-
----
-
-## Step 9 — Integrate Apple Health Waist Measurements
+# Step 10 — Integrate Apple Health Waist Measurements
 
 **Input**
 
@@ -493,60 +488,20 @@ This step:
 data/processed/apple_daily/waistcircumference_clean.csv
 ```
 
-### Step 9.1 — Create the SQL Table
-
-Open:
+Run
 
 ```text
 sql/waist_data_integration.sql
 ```
 
-<div style="color:red; font-weight:bold;">
+**Purpose**
 
-⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+Compare Apple Health waist circumference measurements against the validated measurement database. Existing waist measurements are updated where matching dates already exist, while new historical observations are inserted only when no corresponding measurement date is present.
 
-Run **Section 1 only**.
+The merged dataset is validated by checking record counts, duplicate dates, and chronological ordering to ensure a single longitudinal waist measurement history.
 
-⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-
-</div>
-
-This creates the `waist_appleData` table inside the `fitnessData` database.
-
-Do not continue until the table has been populated.
-
----
-
-### Step 9.2 — Import the Cleaned Dataset
-
-Using **MySQL Workbench**, import:
+**Output**
 
 ```text
-data/processed/apple_daily/waistcircumference_clean.csv
+measurements_clean
 ```
-
-into the `waist_appleData` table.
-
-This dataset has already been cleaned and standardized during the Apple Health preprocessing pipeline and is imported directly without additional modification.
-
----
-
-### Step 9.3 — Validate and Merge
-
-Return to:
-
-```text
-sql/waist_data_integration.sql
-```
-
-Run the remaining sections.
-
-This step:
-
-- Confirms the expected number of imported waist measurements.
-- Reviews duplicate Apple Health measurement dates.
-- Removes duplicate observations after manual validation.
-- Merges only unique Apple Health waist measurements into the intermediate `waist` table.
-- Updates existing waist measurements in `measurements_clean`.
-- Inserts newly recovered measurement dates into `measurements_clean`.
-- Validates the finalized measurement database.

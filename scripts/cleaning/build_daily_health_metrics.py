@@ -58,12 +58,32 @@ def process_point_measurements(df):
 
     df = (
         df[
-            ["date","unit","value"]
+            ["date", "unit", "value"]
         ]
         .copy()
     )
 
+    # --------------------------------------------------------
+    # Resolve duplicate measurements collected on the same day.
+    #
+    # If multiple body measurements exist for a single calendar
+    # date, retain the largest recorded value. This produces a
+    # single daily observation suitable for downstream feature
+    # engineering and SQL storage.
+    # --------------------------------------------------------
+
+    df = (
+        df.sort_values("value", ascending=False)
+          .drop_duplicates(
+              subset="date",
+              keep="first"
+          )
+          .sort_values("date")
+          .reset_index(drop=True)
+    )
+
     return df
+
 def process_daily_sum(df):
 
     df = convert_to_datetime(
