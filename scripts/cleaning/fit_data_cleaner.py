@@ -708,6 +708,7 @@ print(
 # ============================================================
 # MODEL DATASET
 # ============================================================
+
 # (Only add filtering here if manual review justifies it.)
 
 profile_col(
@@ -716,6 +717,32 @@ profile_col(
     title="Yoga"
 )
 
+# Keep only the calendar date
+df_model["Date"] = (
+    pd.to_datetime(df_model["Date"])
+    .dt.date
+)
+
+# Best Lap Time is not used in the model
+df_model = df_model.drop(
+    columns=["Best Lap Time"],
+    errors="ignore"
+)
+
+# Convert workout duration to minutes
+df_model["Total Time"] = (
+    df_model["Total Time"]
+    .dt.total_seconds()
+    .div(60)
+    .round(2)
+)
+
+# Save in chronological order
+df_model = (
+    df_model
+    .sort_values("Date")
+    .reset_index(drop=True)
+)
 
 
 # ============================================================

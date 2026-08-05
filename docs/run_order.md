@@ -505,3 +505,92 @@ The merged dataset is validated by checking record counts, duplicate dates, and 
 ```text
 measurements_clean
 ```
+
+---
+
+# Step 11 — Build Apple Feature Windows
+
+**Input**
+
+```text
+data/raw/weight_aug2026.csv
+
+data/processed/apple_daily/
+```
+
+Run
+
+```text
+scripts/processing/build_apple_features.py
+```
+
+**Purpose**
+
+The processed Apple Health datasets contain one standardized daily observation for each health metric. This step transforms those daily observations into predictor variables aligned with each body-weight measurement.
+
+For every body-weight observation contained within `weight_aug2026.csv`, the script searches the previous seven calendar days of each processed Apple Health dataset and summarizes the observations into a single engineered feature.
+
+Aggregation methods are selected according to the type of metric being processed.
+
+### Seven-Day Totals
+
+The following metrics are summarized using the cumulative seven-day total.
+
+- Active Energy Burned
+- Apple Exercise Time
+- Basal Energy Burned
+- Distance Walking Running
+- Flights Climbed
+- Step Count
+
+### Seven-Day Averages
+
+The following metrics are summarized using the mean value observed during the previous seven days.
+
+- Heart Rate
+- Heart Rate Variability (SDNN)
+- Respiratory Rate
+- Walking Heart Rate Average
+- Walking Speed
+- Walking Step Length
+
+For every processed dataset the script:
+
+- Loads the processed daily Apple Health dataset.
+- Searches the seven days preceding each body-weight measurement.
+- Aggregates the observations using the appropriate method.
+- Creates one engineered feature for every body-weight observation.
+- Exports each engineered feature dataset independently.
+
+The feature engineering utilities are implemented in
+
+```text
+src/tools_for_cleaning.py
+```
+
+and executed by
+
+```text
+scripts/processing/build_apple_features.py
+```
+
+**Output**
+
+```text
+data/processed/apple_features/
+
+├── activeenergyburned_features.csv
+├── appleexercisetime_features.csv
+├── basalenergyburned_features.csv
+├── distancewalkingrunning_features.csv
+├── flightsclimbed_features.csv
+├── heartrate_features.csv
+├── heartratevariabilitysdnn_features.csv
+├── respiratoryrate_features.csv
+├── stepcount_features.csv
+├── walkingheartrateaverage_features.csv
+├── walkingspeed_features.csv
+└── walkingsteplength_features.csv
+```
+
+These datasets provide the Apple Health predictor variables that will later be merged into the project's master modeling dataset.
