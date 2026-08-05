@@ -1,12 +1,12 @@
 """
 ============================================================
-BUILD GARMIN FEATURE WINDOWS
+BUILD APPLE FEATURE WINDOWS
 ============================================================
 
 Purpose
 -------
-Create 7-day feature windows for every processed Garmin
-daily metric using the recovered body-weight timeline.
+Create 7-day feature windows for every processed Apple
+Health daily metric using the recovered weight timeline.
 
 For each weight measurement date, calculate either:
 
@@ -17,7 +17,7 @@ depending on the feature.
 
 Outputs are written to:
 
-data/processed/garmin_features/
+data/processed/apple_features/
 
 Author:
     Melody Sanchez
@@ -29,6 +29,7 @@ Project:
 
 from pathlib import Path
 import sys
+import pandas as pd
 
 # ============================================================
 # PROJECT PATH
@@ -53,11 +54,11 @@ from src.tools_for_cleaning import (
 # INPUT FOLDERS
 # ============================================================
 
-GARMIN_FOLDER = (
+APPLE_FOLDER = (
     PROJECT_ROOT
     / "data"
     / "processed"
-    / "garmin_daily"
+    / "apple_daily"
 )
 
 WEIGHT_FILE = (
@@ -71,7 +72,7 @@ OUTPUT_FOLDER = (
     PROJECT_ROOT
     / "data"
     / "processed"
-    / "garmin_features"
+    / "apple_features"
 )
 
 OUTPUT_FOLDER.mkdir(
@@ -85,29 +86,27 @@ OUTPUT_FOLDER.mkdir(
 
 FEATURE_METHOD = {
 
-    # Weekly totals
-    "distance_daily.csv": "sum",
-    "calories_daily.csv": "sum",
-    "totaltime_daily.csv": "sum",
-    "steps_daily.csv": "sum",
-    "totalascent_daily.csv": "sum",
-    "totaldescent_daily.csv": "sum",
-    "totalreps_daily.csv": "sum",
-    "totalsets_daily.csv": "sum",
+    # Daily totals
+    "activeenergyburned_clean.csv": "sum",
+    "appleexercisetime_clean.csv": "sum",
+    "basalenergyburned_clean.csv": "sum",
+    "distancewalkingrunning_clean.csv": "sum",
+    "flightsclimbed_clean.csv": "sum",
+    "stepcount_clean.csv": "sum",
 
-    # Weekly averages
-    "avg_hr_daily.csv": "mean",
-    "avg_stride_length_daily.csv": "mean",
-    "bodybatterydrain_daily.csv": "mean"
+    # Daily averages
+    "heartrate_clean.csv": "mean",
+    "heartratevariabilitysdnn_clean.csv": "mean",
+    "walkingheartrateaverage_clean.csv": "mean",
+    "walkingspeed_clean.csv": "mean",
+    "walkingsteplength_clean.csv": "mean",
 }
 
 # ============================================================
 # LOAD WEIGHT DATA
 # ============================================================
 
-weight_df = load_csv(
-    WEIGHT_FILE
-)
+weight_df = load_csv(WEIGHT_FILE)
 
 weight_df = convert_to_datetime(
     weight_df,
@@ -125,39 +124,42 @@ for feature_file, method in FEATURE_METHOD.items():
     print(feature_file)
     print("=" * 70)
 
-    garmin_df = load_csv(
-        GARMIN_FOLDER / feature_file
+    apple_df = load_csv(
+        APPLE_FOLDER / feature_file
     )
 
-    garmin_df = convert_to_datetime(
-        garmin_df,
+    apple_df = convert_to_datetime(
+        apple_df,
         "date"
     )
 
     feature_df = weight_df.copy()
 
-    value_column = garmin_df.columns[-1]
-
-    if method == "sum":
-      suffix = "total"
-    else:
-        suffix = "avg"
-
-    feature_column = (
-        feature_file
-        .replace("_daily.csv", "")
-        + "_7day_"
-        + suffix
+    feature_df["value"] = feature_df["date"].apply(
+        lambda measurement_date:
+        aggregate_metric_before_measurement(
+            measurement_date=measurement_date,
+            df=apple_df,
+            method=method,
+            days=7,
+            value_column="value"
+        )
     )
+    feature_column = (
+    feature_file
+    .replace("_clean.csv", "")
+    + "_7day_"
+    + method
+)
 
     feature_df[feature_column] = feature_df["date"].apply(
         lambda measurement_date:
         aggregate_metric_before_measurement(
             measurement_date=measurement_date,
-            df=garmin_df,
+            df=apple_df,
             method=method,
             days=7,
-            value_column=value_column
+            value_column="value"
         )
     )
 
@@ -169,17 +171,17 @@ for feature_file, method in FEATURE_METHOD.items():
         ]
     ]
 
-    output_name = (
-        feature_file
-        .replace("_daily.csv", "_features.csv")
-    )
+    feature_name = feature_file.replace(
+            "_clean.csv",
+            "_features.csv"
+        )
 
     save_csv(
         feature_df,
-        OUTPUT_FOLDER / output_name
+        OUTPUT_FOLDER / feature_name
     )
 
 print()
 print("=" * 70)
-print("Finished building Garmin feature windows.")
+print("Finished building Apple feature windows.")
 print("=" * 70)
