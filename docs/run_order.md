@@ -593,4 +593,95 @@ data/processed/apple_features/
 └── walkingsteplength_features.csv
 ```
 
-These datasets provide the Apple Health predictor variables that will later be merged into the project's master modeling dataset.
+## These datasets provide the Apple Health predictor variables that will later be merged into the project's master modeling dataset.
+
+# Step 12 — Build Garmin Feature Windows
+
+**Input**
+
+```text
+data/raw/weight_aug2026.csv
+
+data/processed/garmin_daily/
+```
+
+Run
+
+```text
+scripts/processing/build_garmin_features.py
+```
+
+**Purpose**
+
+After the Garmin activity data has been cleaned and aggregated into standardized daily metrics, this step transforms those daily observations into engineered predictor variables aligned with each body-weight measurement.
+
+For every body-weight observation contained within `weight_aug2026.csv`, the script searches the previous seven calendar days of each processed Garmin dataset and summarizes the observations into a single engineered feature.
+
+Aggregation methods are selected according to the type of metric being processed.
+
+### Seven-Day Totals
+
+The following metrics are summarized using cumulative seven-day totals.
+
+- Distance
+- Calories
+- Total Time
+- Steps
+- Total Ascent
+- Total Descent
+- Total Repetitions
+- Total Sets
+
+### Seven-Day Averages
+
+The following metrics are summarized using seven-day averages.
+
+- Average Heart Rate
+- Maximum Heart Rate
+- Average Speed
+- Maximum Speed
+- Average Stride Length
+- Body Battery Drain
+
+For every processed Garmin dataset the script:
+
+- Loads the standardized daily dataset.
+- Searches the seven days preceding each body-weight measurement.
+- Aggregates observations using the appropriate method.
+- Generates one engineered feature for every body-weight observation.
+- Exports each engineered feature dataset independently.
+
+The feature engineering utilities are implemented in
+
+```text
+src/tools_for_cleaning.py
+```
+
+and executed by
+
+```text
+scripts/processing/build_garmin_features.py
+```
+
+**Output**
+
+```text
+data/processed/garmin_features/
+
+├── distance_features.csv
+├── calories_features.csv
+├── totaltime_features.csv
+├── steps_features.csv
+├── totalascent_features.csv
+├── totaldescent_features.csv
+├── totalreps_features.csv
+├── totalsets_features.csv
+├── avg_hr_features.csv
+├── max_hr_features.csv
+├── avg_speed_features.csv
+├── max_speed_features.csv
+├── avg_stride_length_features.csv
+└── bodybatterydrain_features.csv
+```
+
+These engineered datasets provide the Garmin predictor variables that will later be merged with the Apple Health feature datasets to construct the project's final modeling dataset.
