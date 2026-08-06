@@ -518,7 +518,7 @@ data/raw/weight_aug2026.csv
 data/processed/apple_daily/
 ```
 
-Run
+**Run**
 
 ```text
 scripts/processing/build_apple_features.py
@@ -526,15 +526,15 @@ scripts/processing/build_apple_features.py
 
 **Purpose**
 
-The processed Apple Health datasets contain one standardized daily observation for each health metric. This step transforms those daily observations into predictor variables aligned with each body-weight measurement.
+The processed Apple Health datasets contain one standardized daily observation for each health metric. This step transforms those daily observations into engineered predictor variables aligned with each body-weight measurement.
 
-For every body-weight observation contained within `weight_aug2026.csv`, the script searches the previous seven calendar days of each processed Apple Health dataset and summarizes the observations into a single engineered feature.
+For every body-weight observation contained within `weight_aug2026.csv`, the script searches the previous seven calendar days of each processed Apple Health dataset and summarizes those observations into a single engineered feature.
 
 Aggregation methods are selected according to the type of metric being processed.
 
 ### Seven-Day Totals
 
-The following metrics are summarized using the cumulative seven-day total.
+The following metrics are summarized using cumulative seven-day totals.
 
 - Active Energy Burned
 - Apple Exercise Time
@@ -545,7 +545,7 @@ The following metrics are summarized using the cumulative seven-day total.
 
 ### Seven-Day Averages
 
-The following metrics are summarized using the mean value observed during the previous seven days.
+The following metrics are summarized using seven-day averages.
 
 - Heart Rate
 - Heart Rate Variability (SDNN)
@@ -558,8 +558,8 @@ For every processed dataset the script:
 
 - Loads the processed daily Apple Health dataset.
 - Searches the seven days preceding each body-weight measurement.
-- Aggregates the observations using the appropriate method.
-- Creates one engineered feature for every body-weight observation.
+- Aggregates observations using the appropriate summary statistic.
+- Generates one engineered feature for every body-weight observation.
 - Exports each engineered feature dataset independently.
 
 The feature engineering utilities are implemented in
@@ -593,7 +593,9 @@ data/processed/apple_features/
 └── walkingsteplength_features.csv
 ```
 
-## These datasets provide the Apple Health predictor variables that will later be merged into the project's master modeling dataset.
+These engineered datasets provide the Apple Health predictor variables used to construct the project's final modeling dataset.
+
+---
 
 # Step 12 — Build Garmin Feature Windows
 
@@ -605,7 +607,7 @@ data/raw/weight_aug2026.csv
 data/processed/garmin_daily/
 ```
 
-Run
+**Run**
 
 ```text
 scripts/processing/build_garmin_features.py
@@ -615,7 +617,7 @@ scripts/processing/build_garmin_features.py
 
 After the Garmin activity data has been cleaned and aggregated into standardized daily metrics, this step transforms those daily observations into engineered predictor variables aligned with each body-weight measurement.
 
-For every body-weight observation contained within `weight_aug2026.csv`, the script searches the previous seven calendar days of each processed Garmin dataset and summarizes the observations into a single engineered feature.
+For every body-weight observation contained within `weight_aug2026.csv`, the script searches the previous seven calendar days of each processed Garmin dataset and summarizes those observations into a single engineered feature.
 
 Aggregation methods are selected according to the type of metric being processed.
 
@@ -643,11 +645,11 @@ The following metrics are summarized using seven-day averages.
 - Average Stride Length
 - Body Battery Drain
 
-For every processed Garmin dataset the script:
+For every processed dataset the script:
 
 - Loads the standardized daily dataset.
 - Searches the seven days preceding each body-weight measurement.
-- Aggregates observations using the appropriate method.
+- Aggregates observations using the appropriate summary statistic.
 - Generates one engineered feature for every body-weight observation.
 - Exports each engineered feature dataset independently.
 
@@ -684,4 +686,57 @@ data/processed/garmin_features/
 └── bodybatterydrain_features.csv
 ```
 
-These engineered datasets provide the Garmin predictor variables that will later be merged with the Apple Health feature datasets to construct the project's final modeling dataset.
+These engineered datasets provide the Garmin predictor variables used to construct the project's final modeling dataset.
+
+---
+
+# Step 13 — Build Master Modeling Dataset
+
+**Input**
+
+```text
+data/raw/weight_aug2026.csv
+
+data/processed/apple_features/
+
+data/processed/garmin_features/
+```
+
+**Run**
+
+```text
+scripts/cleaning/build_weight_master_features.py
+```
+
+**Purpose**
+
+At this stage, engineered predictor variables have been created independently from both Apple Health and Garmin data. This step combines every engineered feature into a single longitudinal modeling dataset aligned with the recovered body-weight timeline.
+
+The pipeline automatically loads every Apple Health feature dataset and every Garmin feature dataset before merging them using the measurement date as the common key.
+
+After all engineered features have been merged, feature names are standardized to maintain consistent naming conventions across data sources.
+
+Equivalent distance features are then reconciled by treating Garmin distance as the primary source whenever it is available. Apple Health distance is used only to fill historical observations that occurred before Garmin data existed. This preserves the complete historical distance record while avoiding duplicate measurements during periods where both data sources overlap.
+
+The completed dataset contains one row for every body-weight observation together with every engineered predictor variable generated throughout the project.
+
+The script performs the following steps:
+
+- Loads the validated body-weight timeline.
+- Merges every Apple Health engineered feature.
+- Merges every Garmin engineered feature.
+- Standardizes feature names.
+- Reconciles overlapping distance features.
+- Removes the redundant Apple distance feature after reconciliation.
+- Audits the completed modeling dataset.
+- Exports the final modeling dataset.
+
+**Output**
+
+```text
+data/processed/
+
+└── weight_master_features.csv
+```
+
+This dataset serves as the primary input for exploratory data analysis, correlation analysis, visualization, statistical modeling, and machine learning.
