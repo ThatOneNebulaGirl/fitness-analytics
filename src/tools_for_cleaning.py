@@ -349,12 +349,44 @@ def create_date_column(
 
     return df
 
+# used for APPLE agg
+# def aggregate_daily_sum(
+#     df,
+#     date_column="start_date",
+#     value_column="value"
+# ):
+#     temp = df.copy()
+
+#     temp["date"] = (
+#         pd.to_datetime(
+#             temp[date_column]
+#         )
+#         .dt.normalize()
+#     )
+
+#     daily = (
+#         temp
+#         .groupby("date")[value_column]
+#         .sum()
+#         .reset_index()
+#     )
+
+#     daily["date"] = daily["date"].dt.date
+#     daily["value"] = daily["value"].round(2)
+
+#     return daily
+# used for GARMIN aggr
 def aggregate_daily_sum(
     df,
     date_column="start_date",
     value_column="value"
 ):
     temp = df.copy()
+
+    # Remove rows where this metric is missing
+    temp = temp[
+        temp[value_column].notna()
+    ]
 
     temp["date"] = (
         pd.to_datetime(
@@ -371,9 +403,42 @@ def aggregate_daily_sum(
     )
 
     daily["date"] = daily["date"].dt.date
-    daily["value"] = daily["value"].round(2)
+
+    daily[value_column] = (
+        daily[value_column]
+        .round(2)
+    )
 
     return daily
+# used for APPLE agre
+# def aggregate_daily_mean(
+#     df,
+#     date_column="start_date",
+#     value_column="value"
+# ):
+
+#     temp = df.copy()
+
+#     temp["date"] = (
+#         pd.to_datetime(
+#             temp[date_column]
+#         )
+#         .dt.normalize()
+#     )
+
+#     daily = (
+#         temp
+#         .groupby("date")[value_column]
+#         .mean()
+#         .reset_index()
+#     )
+
+
+#     daily["date"] = daily["date"].dt.date
+#     daily["value"] = daily["value"].round(2)
+
+#     return daily
+# used for GARMIN aggre
 
 def aggregate_daily_mean(
     df,
@@ -382,6 +447,11 @@ def aggregate_daily_mean(
 ):
 
     temp = df.copy()
+
+    # Remove rows where the metric is missing
+    temp = temp[
+        temp[value_column].notna()
+    ]
 
     temp["date"] = (
         pd.to_datetime(
@@ -397,12 +467,14 @@ def aggregate_daily_mean(
         .reset_index()
     )
 
-
     daily["date"] = daily["date"].dt.date
-    daily["value"] = daily["value"].round(2)
+
+    daily[value_column] = (
+        daily[value_column]
+        .round(2)
+    )
 
     return daily
-
 
 def get_window(
     df,
@@ -421,9 +493,10 @@ def get_window(
     ]
 
 
-def average_metric_before_measurement(
+def aggregate_metric_before_measurement(
     measurement_date,
     df,
+    method="mean",
     days=7,
     value_column="value"
 ):
@@ -434,7 +507,23 @@ def average_metric_before_measurement(
         days
     )
 
-    return window[value_column].mean()
+    if len(window) == 0:
+        return np.nan
+
+    if method == "sum":
+        return window[value_column].sum()
+
+    elif method == "mean":
+        return window[value_column].mean()
+
+    elif method == "max":
+        return window[value_column].max()
+
+    elif method == "min":
+        return window[value_column].min()
+
+    else:
+        raise ValueError(f"Unknown aggregation method: {method}")
 
 
 

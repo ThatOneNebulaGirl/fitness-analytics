@@ -39,19 +39,25 @@ The resulting pipeline supports longitudinal analyses of body composition, train
 
 ## Skills Demonstrated
 
-This project demonstrates an end-to-end analytics workflow involving:
+This project demonstrates:
 
-- Data cleaning and preprocessing
-- Feature engineering
+- Python
+- Pandas
+- NumPy
+- SQL (MySQL)
+- Data Cleaning
+- ETL Pipelines
+- Data Integration
+- Feature Engineering
 - Exploratory Data Analysis (EDA)
-- Statistical analysis
-- Regression modeling
-- Longitudinal data analysis
-- SQL data management
-- Data integration from multiple heterogeneous sources
-- Python automation
-- Data visualization
-- Reproducible analytical pipelines
+- Statistical Analysis
+- Pearson Correlation Analysis
+- Linear Regression
+- Regression Diagnostics
+- Hypothesis Testing
+- Data Visualization
+- Longitudinal Data Analysis
+- Reproducible Research
 
 ---
 
@@ -162,17 +168,21 @@ The pipeline performs:
 
 ## Results
 
-The completed pipeline produces reproducible analytical datasets used throughout the project.
+The completed pipeline produces reproducible analytical datasets supporting exploratory statistical analyses of longitudinal fitness behavior.
 
-Example analyses include:
+Current analyses include:
 
-- **Leg Press Relative Strength Progression** — relative lower-body strength over time after accounting for body weight.
-- **Lat Pulldown: Strength vs Body Weight** — upper-body strength progression alongside changes in body weight.
-- Longitudinal body composition trends.
-- Measurement-window feature engineering for predictive modeling.
-- Correlation analyses between physiological metrics and body measurements.
+- Relative strength progression adjusted for body weight.
+- Longitudinal body-weight and body-composition trends.
+- Seven-day measurement-window feature engineering.
+- Pearson correlation analysis across engineered behavioral and physiological features.
+- Simple linear regression screening of engineered predictors.
+- Regression diagnostics, including residual analysis and normal Q–Q assessment.
+- Identification of behavioral features most strongly associated with body weight.
 
-_(Insert figures here.)_
+Current findings indicate that weekly Apple Step Count and Distance exhibited the strongest linear relationships with body weight, while Walking Step Length demonstrated a weaker but statistically significant association. The remaining engineered predictors explained little of the observed variation in body weight.
+
+_(Representative figures will be added as the project continues.)_
 
 ---
 

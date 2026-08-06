@@ -213,36 +213,48 @@ corr.rename(
 # HEATMAP
 # ============================================================
 
-plt.figure(
-    figsize=(11, 9)
-)
+plt.figure(figsize=(11, 9))
 
 image = plt.imshow(
     corr,
-    cmap="PiYG",
+    cmap="PiYG",          # keep Sanrio-style pink/green
     vmin=-1,
     vmax=1,
     interpolation="nearest",
     aspect="equal"
 )
 
-plt.colorbar(image)
+# Softer colorbar
+cbar = plt.colorbar(
+    image,
+    shrink=0.88
+)
+
+cbar.ax.tick_params(
+    labelsize=10,
+    colors="#666666"
+)
+
+# Axis labels
 
 plt.xticks(
     range(len(corr.columns)),
     corr.columns,
     rotation=45,
     ha="right",
-    fontsize=9
+    fontsize=10,
+    color="#444444"
 )
 
 plt.yticks(
     range(len(corr.columns)),
     corr.columns,
-    fontsize=9
+    fontsize=11,
+    color="#444444"
 )
 
-# Write correlation values inside cells
+# Correlation values
+
 for i in range(len(corr.index)):
     for j in range(len(corr.columns)):
 
@@ -257,12 +269,33 @@ for i in range(len(corr.index)):
                 ha="center",
                 va="center",
                 fontsize=8,
-                color="black"
+                color="#222222"
             )
 
+# Cute title
+
 plt.title(
-    "Correlation Matrix of Behavioral, Physiological, and Body Composition Variables",
-    fontsize=15
+    "Correlation Matrix of Behavioral, Physiological,\nand Body Composition Variables",
+    fontsize=21,
+    color="#F06CA8",      # same raspberry pink
+    fontweight="bold",
+    pad=18
+)
+
+# Remove grid
+plt.grid(False)
+
+# Softer axes
+
+ax = plt.gca()
+
+ax.spines["top"].set_color("#555555")
+ax.spines["right"].set_color("#555555")
+ax.spines["left"].set_color("#555555")
+ax.spines["bottom"].set_color("#555555")
+
+ax.tick_params(
+    colors="#444444"
 )
 
 plt.tight_layout()
@@ -274,11 +307,3 @@ plt.savefig(
 )
 
 plt.close()
-
-print()
-print("=" * 70)
-print("Saved")
-print("=" * 70)
-
-print(OUTPUT_CSV)
-print(OUTPUT_FIGURE)

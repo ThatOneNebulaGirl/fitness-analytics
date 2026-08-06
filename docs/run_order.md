@@ -740,3 +740,91 @@ data/processed/
 ```
 
 This dataset serves as the primary input for exploratory data analysis, correlation analysis, visualization, statistical modeling, and machine learning.
+
+---
+
+# Step 14 — Exploratory Statistical Analysis
+
+**Input**
+
+```text
+data/processed/weight_master_features.csv
+```
+
+**Run**
+
+```text
+scripts/analysis/correlation_matrix.py
+```
+
+**Purpose**
+
+This step performs exploratory analysis of the completed modeling dataset by computing Pearson correlation coefficients among the engineered behavioral, physiological, and body-composition variables.
+
+The correlation matrix is used to identify candidate predictors for subsequent regression modeling while providing an overview of the relationships present within the longitudinal dataset.
+
+The script performs the following steps:
+
+- Loads the completed modeling dataset.
+- Computes the Pearson correlation matrix.
+- Exports the full correlation matrix.
+- Generates a publication-quality correlation heatmap.
+
+**Output**
+
+```text
+data/processed/
+└── correlation_matrix.csv
+
+figures/
+└── correlation_matrix.png
+```
+
+---
+
+# Step 15 — Regression Screening
+
+**Input**
+
+```text
+data/processed/weight_master_features.csv
+```
+
+**Run**
+
+```text
+scripts/analysis/weight_regression.py
+```
+
+**Purpose**
+
+Each engineered predictor is independently evaluated using ordinary least squares (OLS) regression to quantify its relationship with body weight.
+
+For every predictor, the script computes:
+
+- Sample size
+- Pearson correlation
+- Regression equation
+- Coefficient of determination (R²)
+- Mean Absolute Error (MAE)
+- Root Mean Squared Error (RMSE)
+- t-statistic
+- F-statistic
+- p-value
+- 95% confidence interval
+
+Regression diagnostic figures are also generated to evaluate residual behavior and assess the assumptions of linear regression.
+
+**Output**
+
+```text
+figures/
+└── weight_regression/
+    ├── tier1/
+    ├── tier2/
+    └── diagnostics/
+```
+
+The regression screening process identifies the strongest candidate predictors for subsequent statistical modeling.
+
+---
