@@ -14,24 +14,7 @@ Answering that question required building an end-to-end analytics pipeline that 
 
 The overall data pipeline follows the workflow below:
 
-```text
-Raw exports
-      │
-      ▼
-Python ingestion
-      │
-      ▼
-MySQL relational database
-      │
-      ▼
-SQL validation & cleaning
-      │
-      ▼
-Merged analytical datasets
-      │
-      ▼
-Statistical analysis
-```
+![PipeLine](figures/pipeline.png)
 
 The resulting pipeline supports longitudinal analyses of body composition, training volume, strength progression, recovery metrics, and relationships between exercise behavior and physical outcomes.
 
@@ -173,10 +156,19 @@ The pipeline performs:
 
 The completed pipeline produces reproducible analytical datasets supporting exploratory statistical analyses of longitudinal fitness behavior.
 
-Current analyses include:
+### Key Findings
+
+- Integrated four independent health data sources into a unified analytical database.
+- Expanded the historical analysis period to more than seven years.
+- Processed and validated over 1.7 million health observations.
+- Developed reproducible ETL, data-cleaning, and feature-engineering pipelines.
+- Identified Distance as the strongest individual predictor of body weight among the variables evaluated.
+- Developed and evaluated multiple linear regression models using engineered behavioral predictors.
+
+To investigate the project's research questions, the following analytical methods were implemented:
 
 - Relative strength progression adjusted for body weight.
-- Longitudinal body-weight and body-composition trends.
+- Longitudinal body-weight and body-composition trend analysis.
 - Seven-day measurement-window feature engineering.
 - Pearson correlation analysis across engineered behavioral and physiological features.
 - Simple linear regression screening of engineered predictors.
@@ -185,9 +177,40 @@ Current analyses include:
 - Regression diagnostics, including residual analysis, normal Q–Q assessment, and actual-versus-predicted model evaluation.
 - Identification of behavioral features most strongly associated with body weight.
 
-Current findings indicate that weekly Distance and Apple Step Count exhibited the strongest individual linear relationships with body weight. Because these variables were highly collinear, Apple Step Count was excluded from the final multiple regression model. The final model retained Distance and Walking Step Length, providing the best balance between predictor independence, sample size, and interpretability.
+The resulting analyses indicate that weekly Distance and Apple Step Count exhibited the strongest individual linear relationships with body weight. Because these variables were highly collinear, Apple Step Count was excluded from the final multiple regression model. The final model retained Distance and Walking Step Length, providing the best balance between predictor independence, sample size, and interpretability.
 
-_(Representative figures will be added as the project continues.)_
+### Key Findings
+
+- Integrated four independent health data sources.
+- Expanded historical coverage to more than seven years.
+- Processed more than 1.7 million health observations.
+- Built reproducible ETL and feature-engineering pipelines.
+- Distance exhibited the strongest individual relationship with body weight.
+- Developed multiple linear regression models with full diagnostic evaluation.
+
+## Selected Visualizations
+
+The following figures summarize the primary analytical results of this project. Additional visualizations and statistical outputs are available in the accompanying Jupyter notebook.
+
+### Correlation Analysis
+
+![Correlation Matrix](figures/correlation_matrix.png)
+
+The full correlation matrix was used during exploratory data analysis to identify potential relationships between behavioral, physiological, and body-composition variables. Average distance traveled exhibited one of the strongest negative correlations with body weight, making it a strong candidate for subsequent regression analysis. The matrix also revealed substantial correlations among several predictor variables, motivating additional multicollinearity assessment before model construction.
+
+### Predictor Selection
+
+![Candidate Predictor Correlation Matrix](figures/multiple_regression/multiple_regression_predictor_correlation.png)
+
+Candidate predictors were evaluated for multicollinearity prior to multiple linear regression. Apple Step Count and Distance demonstrated a very strong positive correlation (Pearson _r_ = 0.94), indicating that both variables contained largely overlapping information. Distance was retained because it exhibited the stronger relationship with body weight, while Apple Step Count was removed to reduce multicollinearity and improve model interpretability.
+
+### Regression Diagnostics
+
+|              Residuals vs. Fitted              |               Normal Q-Q Plot               |
+| :--------------------------------------------: | :-----------------------------------------: |
+| ![](figures/multiple_regression_residuals.png) | ![](figures/multiple_regression_qqplot.png) |
+
+Diagnostic plots were used to evaluate the assumptions of the final multiple linear regression model. The residual plot showed no strong systematic pattern, supporting the assumption of linearity, while the Q-Q plot indicated that residuals were approximately normally distributed with only minor deviations at the extremes. Together, these diagnostics suggested that the final regression model provided a reasonable fit for the available longitudinal dataset.
 
 ---
 
@@ -202,17 +225,12 @@ Additional documentation is located in the `docs/` directory.
 
 ## Future Improvements
 
-Potential future extensions include:
-
-- Regularized regression (Ridge and LASSO)
-- Cross-validation of predictive models
-- Time-series forecasting
-- Random Forest regression
-- XGBoost
-- Interactive dashboard
+- Automate Garmin Connect data extraction using Selenium.
+- Schedule nightly ETL execution on a Raspberry Pi or another always-on system.
+- Expand the database with exercise-specific strength metrics.
+- Incorporate daily macronutrient intake into the analytical dataset.
+- Continue increasing longitudinal data coverage to improve statistical power.
+- Evaluate additional predictive modeling approaches as the dataset grows.
+- Develop interactive dashboards for longitudinal health monitoring.
 
 ---
-
-## License
-
-MIT License

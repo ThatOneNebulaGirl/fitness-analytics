@@ -871,3 +871,39 @@ figures/multiple_regression/
 ```
 
 This analysis identifies the final multivariable statistical model used throughout the project.
+
+---
+
+---
+
+# Step 17 — Jupyter Notebook
+
+**Input**
+
+```text
+data/processed/weight_master_features.csv
+
+figures/
+
+outputs from Steps 1–16
+```
+
+**Open**
+
+```text
+notebooks/Longitudinal_Fitness_Analytics.ipynb
+```
+
+**Purpose**
+
+The notebook serves as the final analytical report for the project. It documents the complete engineering workflow, data-cleaning methodology, feature engineering, exploratory analyses, statistical modeling, regression diagnostics, and project conclusions.
+
+Rather than performing additional data processing, the notebook integrates the outputs generated throughout the previous steps into a reproducible research document that explains the analytical decisions, presents the statistical findings, discusses project limitations, and outlines future directions for continued data collection and model development.
+
+**Output**
+
+```text
+Final reproducible analytical report
+```
+
+This notebook represents the culmination of the complete analytics pipeline and should be executed only after all previous processing, feature engineering, and statistical analysis steps have been completed successfully.
