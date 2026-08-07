@@ -58,6 +58,9 @@ This project demonstrates:
 - Data Visualization
 - Longitudinal Data Analysis
 - Reproducible Research
+- Multiple Linear Regression
+- Multicollinearity Assessment (VIF)
+- Model Selection
 
 ---
 
@@ -177,10 +180,12 @@ Current analyses include:
 - Seven-day measurement-window feature engineering.
 - Pearson correlation analysis across engineered behavioral and physiological features.
 - Simple linear regression screening of engineered predictors.
-- Regression diagnostics, including residual analysis and normal Q–Q assessment.
+- Multiple linear regression modeling using engineered behavioral predictors.
+- Multicollinearity assessment using correlation analysis and Variance Inflation Factors (VIFs).
+- Regression diagnostics, including residual analysis, normal Q–Q assessment, and actual-versus-predicted model evaluation.
 - Identification of behavioral features most strongly associated with body weight.
 
-Current findings indicate that weekly Apple Step Count and Distance exhibited the strongest linear relationships with body weight, while Walking Step Length demonstrated a weaker but statistically significant association. The remaining engineered predictors explained little of the observed variation in body weight.
+Current findings indicate that weekly Distance and Apple Step Count exhibited the strongest individual linear relationships with body weight. Because these variables were highly collinear, Apple Step Count was excluded from the final multiple regression model. The final model retained Distance and Walking Step Length, providing the best balance between predictor independence, sample size, and interpretability.
 
 _(Representative figures will be added as the project continues.)_
 
@@ -199,11 +204,12 @@ Additional documentation is located in the `docs/` directory.
 
 Potential future extensions include:
 
-- Time-series forecasting of body composition.
-- Machine learning models for predicting measurement outcomes.
-- Interactive dashboards for exploratory analysis.
-- Automated Garmin and Apple Health data ingestion.
-- Expanded statistical validation and model comparison.
+- Regularized regression (Ridge and LASSO)
+- Cross-validation of predictive models
+- Time-series forecasting
+- Random Forest regression
+- XGBoost
+- Interactive dashboard
 
 ---
 

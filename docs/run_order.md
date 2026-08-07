@@ -828,3 +828,46 @@ figures/
 The regression screening process identifies the strongest candidate predictors for subsequent statistical modeling.
 
 ---
+
+# Step 16 — Multiple Linear Regression
+
+**Input**
+
+```text
+data/processed/weight_master_features.csv
+```
+
+**Run**
+
+```text
+scripts/analysis/multiple_regression.py
+```
+
+**Purpose**
+
+Construct a multiple linear regression model using the strongest predictors identified during the regression screening phase. Evaluate predictor independence, quantify multicollinearity using Variance Inflation Factors (VIFs), compare candidate models, and assess model assumptions using regression diagnostic plots.
+
+The script performs the following steps:
+
+- Loads the completed modeling dataset.
+- Selects candidate predictors retained from regression screening.
+- Removes incomplete observations.
+- Computes predictor correlation matrix.
+- Calculates Variance Inflation Factors (VIFs).
+- Fits the multiple linear regression model.
+- Reports regression coefficients and statistical inference.
+- Computes MAE and RMSE.
+- Generates regression diagnostic figures.
+
+**Output**
+
+```text
+figures/multiple_regression/
+
+├── multiple_regression_predictor_correlation.png
+├── multiple_regression_residuals.png
+├── multiple_regression_qqplot.png
+└── multiple_regression_actual_vs_predicted.png
+```
+
+This analysis identifies the final multivariable statistical model used throughout the project.
