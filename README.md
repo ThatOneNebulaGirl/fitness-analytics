@@ -206,9 +206,11 @@ Candidate predictors were evaluated for multicollinearity prior to multiple line
 
 ### Regression Diagnostics
 
-|              Residuals vs. Fitted              |               Normal Q-Q Plot               |
-| :--------------------------------------------: | :-----------------------------------------: |
-| ![](figures/multiple_regression_residuals.png) | ![](figures/multiple_regression_qqplot.png) |
+|                                  Residuals vs. Fitted                                  |                                Normal Q-Q Plot                                 |
+| :------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
+| ![Residuals vs. Fitted](figures/multiple_regression/multiple_regression_residuals.png) | ![Normal Q-Q Plot](figures/multiple_regression/multiple_regression_qqplot.png) |
+
+Diagnostic plots were used to evaluate the assumptions of the final multiple linear regression model. The residual plot showed no strong systematic pattern, supporting the assumption of linearity, while the Q-Q plot indicated that residuals were approximately normally distributed with only minor deviations at the extremes. Together, these diagnostics suggested that the final regression model provided a reasonable fit for the available longitudinal dataset.
 
 Diagnostic plots were used to evaluate the assumptions of the final multiple linear regression model. The residual plot showed no strong systematic pattern, supporting the assumption of linearity, while the Q-Q plot indicated that residuals were approximately normally distributed with only minor deviations at the extremes. Together, these diagnostics suggested that the final regression model provided a reasonable fit for the available longitudinal dataset.
 
